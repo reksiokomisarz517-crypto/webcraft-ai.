@@ -53,11 +53,47 @@ export default function Home() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
-  const [color, setColor] = useState("dark");
-  const [generated, setGenerated] = useState(false);
+const [color, setColor] = useState("dark");
+const [template, setTemplate] = useState("modern");
+const [generated, setGenerated] = useState(false);
 
   const theme = themes[color as keyof typeof themes];
   const image = images[type] || images["Inna firma"];
+  const templateStyles: Record<string, string> = {
+  modern: `
+    .hero { border-radius: 0; }
+    .service-card { border-radius: 17px; }
+  `,
+  premium: `
+    body { font-family: Georgia, serif; }
+    header { border-bottom: 2px solid #c9a96e; }
+    .tag { color: #c9a96e; }
+    .btn { background: #c9a96e; color: #111; border-radius: 2px; }
+    .service-card { border: 1px solid #c9a96e; border-radius: 2px; }
+    h1, h2 { letter-spacing: 1px; }
+  `,
+  minimal: `
+    body { font-family: Arial, sans-serif; }
+    header { background: #fff; }
+    .hero { background: ${"#ffffff"} !important; color: #111827; min-height: 430px; }
+    .hero p, .section-intro { color: #475569; }
+    .tag { color: #2563eb; }
+    .btn { border-radius: 3px; }
+    .service-card, .contact { border-radius: 4px; box-shadow: none; }
+  `,
+  business: `
+    body { font-family: Arial, sans-serif; }
+    header { background: #12315a; color: white; }
+    header nav a { color: white; }
+    .hero { min-height: 480px; }
+    .tag { color: #38bdf8; }
+    .btn { background: #12315a; border-radius: 5px; }
+    .service-card { border-radius: 8px; }
+    h2 { color: #12315a; }
+  `,
+};
+
+const selectedTemplateCss = templateStyles[template] || templateStyles.modern;
 
   function escapeHtml(value: string) {
     return value.replace(/[&<>"']/g, (char) => ({
@@ -147,6 +183,7 @@ h2{font-size:36px;margin-bottom:15px}
 .contact{background:${theme.card};border-radius:22px;padding:45px;max-width:750px;margin:auto;border:1px solid #8882}
 .contact a{color:${theme.accent}}
 footer{padding:30px;text-align:center;border-top:1px solid #8884;color:${theme.muted}}
+${selectedTemplateCss}
 @media(max-width:650px){
 header{padding:18px 5%;flex-wrap:wrap;gap:15px}
 nav a{margin-left:10px}
@@ -247,7 +284,8 @@ ${safePhone ? `<a class="btn" href="tel:${phoneLink}">Zadzwoń teraz</a>` : ""}
           </p>
         </div>
 
-        <div className="grid gap-8 rounded-3xl border border-white/10 bg-[#111827] p-6 shadow-2xl md:grid-cols-2 md:p-10">
+        <div className="grid gap-8 rounded-3xl border border-white/kolor strony
+         10 bg-[#111827] p-6 shadow-2xl md:grid-cols-2 md:p-10">
           <div className="space-y-5">
             <h2 className="text-xl font-bold">✦ Dane klienta</h2>
 
@@ -339,7 +377,44 @@ ${safePhone ? `<a class="btn" href="tel:${phoneLink}">Zadzwoń teraz</a>` : ""}
                 className="w-full rounded-xl border border-white/10 bg-[#080b14] p-4 outline-none focus:border-violet-500"
               />
             </div>
+<div>
+  <label className="mb-3 block text-sm text-gray-300">
+    Wybierz szablon strony
+  </label>
 
+  <div className="grid grid-cols-2 gap-3">
+    {[
+      ["modern", "Modern", "Nowoczesny"],
+      ["premium", "Premium", "Luksusowy"],
+      ["minimal", "Minimal", "Prosty"],
+      ["business", "Business", "Firmowy"],
+    ].map(([value, label, description]) => (
+      <button
+        key={value}
+        type="button"
+        onClick={() => {
+          setTemplate(value);
+          setGenerated(false);
+        }}
+        className={`rounded-xl border p-4 text-left transition ${
+          template === value
+            ? "border-violet-400 bg-violet-500/10"
+            : "border-white/10 bg-[#080b14] hover:border-violet-400/50"
+        }`}
+      >
+        <strong className="block">{label}</strong>
+        <span className="mt-1 block text-xs text-gray-400">
+          {description}
+        </span>
+        {template === value && (
+          <span className="mt-2 block text-xs text-violet-400">
+            ✓ Wybrany
+          </span>
+        )}
+      </button>
+    ))}
+  </div>
+</div>
             <div>
               <label className="mb-2 block text-sm text-gray-300">
                 Kolor strony
